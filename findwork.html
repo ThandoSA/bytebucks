@@ -9,9 +9,57 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
     <!-- Stylesheet -->
     <link rel="stylesheet" href="styles.css">
-    <title>Side Hustle Hub</title>
+    <title>Find Work | Side Hustle Hub</title>
 </head>
 <body>
-    
+    <header>
+    <div class="container header-container">  
+        <div class="logo">  
+    <h1><i class="ri-briefcase-line"></i> Side Hustle Hub</h1>
+    </div>
+    <nav class="nav-desktop">
+      <a href="index.html">Home</a>
+      <a href="findwork.html" class="active">Find Work</a>
+      <a href="postajob.html">Post Job</a>
+      <a href="#wallet">Wallet</a>
+    </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h2>Find Work That Matches Your Skills</h2>
+    <p>Connect with local job providers and grow your side hustle.</p>
+  </section>
+
+  <section class="section">
+    <h2><i class="ri-search-line"></i> Start Your Search</h2>
+    <form class="findwork-form">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" placeholder="Enter your name" required>
+
+      <label for="name">Surname</label>
+      <input type="text" id="name" placeholder="Enter your name" required>
+
+      <label for="skills">Skills</label>
+      <input type="text" id="skills" placeholder="e.g., plumbing, tutoring, web design" required>
+
+      <label for="location">Location</label>
+      <input type="text" id="location" placeholder="Enter your city or area" required>
+
+      <label for="availability">Availability</label>
+      <select id="availability">
+        <option value="">Select...</option>
+        <option value="part-time">Part-Time</option>
+        <option value="full-time">Full-Time</option>
+        <option value="freelance">Freelance</option>
+      </select>
+
+      <button type="submit" class="btn"><i class="ri-search-2-line"></i> Find Work</button>
+    </form>
+  </section>
+
+  <footer>
+    <p>© 2025 Side Hustle Hub | Empowering South Africa’s Hustlers</p>
+  </footer>
 </body>
 </html>

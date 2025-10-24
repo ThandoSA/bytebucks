@@ -9,9 +9,52 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
     <!-- Stylesheet -->
     <link rel="stylesheet" href="styles.css">
-    <title>Side hustle Hub</title>
+    <title>Post a Job | Side hustle Hub</title>
 </head>
 <body>
-    
+    <header>
+    <div class="container header-container">  
+        <div class="logo">  
+    <h1><i class="ri-briefcase-line"></i> Side Hustle Hub</h1>
+    </div>
+    <nav class="nav-desktop">
+      <a href="index.html">Home</a>
+      <a href="findwork.html">Find Work</a>
+      <a href="postajob.html" class="active">Post Job</a>
+      <a href="#wallet">Wallet</a>
+    </nav>
+    </div>
+  </header>
+
+   <section class="hero">
+    <h2>Post a Job in Minutes</h2>
+    <p>Connect with local hustlers ready to work — securely and instantly.</p>
+  </section>
+
+  <section class="section">
+    <h2><i class="ri-edit-box-line"></i> Job Details</h2>
+    <form class="postjob-form">
+      <label for="title">Job Title</label>
+      <input type="text" id="title" placeholder="e.g., Garden Maintenance" required>
+
+      <label for="description">Job Description</label>
+      <textarea id="description" rows="4" placeholder="Describe the task and expectations..." required></textarea>
+
+      <label for="pay">Pay Rate (ZAR)</label>
+      <input type="number" id="pay" placeholder="e.g., 500" required>
+
+      <label for="location">Location</label>
+      <input type="text" id="location" placeholder="Enter job area or suburb" required>
+
+      <label for="contact">Contact Email / Phone</label>
+      <input type="text" id="contact" placeholder="Enter your contact details" required>
+
+      <button type="submit" class="btn"><i class="ri-send-plane-line"></i> Post Job</button>
+    </form>
+  </section>
+
+  <footer>
+    <p>© 2025 Side Hustle Hub | Creating Opportunities, One Hustle at a Time</p>
+  </footer>
 </body>
 </html>
