@@ -1,47 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-     <!-- Remix Icon CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
-    <title>Side Hustle Hub</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Side Hustle Hub</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Remix Icon -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<!-- Header -->
-<header>
-  <div class="container header-container">
-    <!-- Logo / Brand -->
-    <div class="logo">
-      <h1>Side Hustle Hub</h1>
+  <header>
+    <div class="container header-container">
+      <div class="logo">
+        <h1>Side Hustle Hub</h1>
+      </div>
+      <nav class="nav-desktop">
+        <a href="#home">Home</a>
+        <a href="find-work.html">Find Work</a>
+        <a href="post-job.html">Post a Job</a>
+        <a href="#wallet">Wallet</a>
+        <a href="#about">About</a>
+      </nav>
+      <div class="auth-buttons">
+        <a href="#signup" class="btn-signup"><i class="ri-user-add-line"></i> Sign Up</a>
+        <a href="#signin" class="btn-signin"><i class="ri-login-box-line"></i> Login</a>
+      </div>
+      <div class="hamburger"><i class="ri-menu-line"></i></div>
     </div>
 
-    <!-- Navigation Menu -->
-    <nav>
-      <ul class="nav-links">
-        <li><a href="#home">Home</a></li>
-        <li><a href="#find-work">Find Work</a></li>
-        <li><a href="#post-job">Post Job</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#contact" class="btn-primary">Get Started</a></li>
-      </ul>
-    </nav>
-
-    <!-- Sign Up / Sign In Buttons -->
-    <div class="auth-buttons">
-      <a href="#signup" class="btn-signup"><i class="ri-user-add-line"></i> Sign Up</a>
-      <a href="#signin" class="btn-signin"><i class="ri-login-box-line"></i> Sign In</a>
+    <div class="mobile-menu">
+      <nav>
+        <a href="#home">Home</a>
+        <a href="find-work.html">Find Work</a>
+        <a href="post-job.html">Post a Job</a>
+        <a href="#wallet">Wallet</a>
+        <a href="#about">About</a>
+      </nav>
+      <div class="auth-buttons">
+        <a href="#signup" class="btn-signup"><i class="ri-user-add-line"></i> Sign Up</a>
+        <a href="#signin" class="btn-signin"><i class="ri-login-box-line"></i> Login</a>
+      </div>
     </div>
+  </header>
 
-    <!-- Hamburger Menu for Mobile -->
-    <div class="hamburger">
-      <i class="ri-menu-line"></i>
+  <section class="hero">
+    <h2>Turn your hustle into income – anytime, anywhere.</h2>
+    <p>Find work. Post jobs. Get paid instantly with FNB.</p>
+    <button class="btn" onclick="window.location.href='find-work.html'">Find Work</button>
+    <button class="btn" onclick="window.location.href='post-job.html'">Post a Job</button>
+  </section>
+
+  <section class="section">
+    <h2>How It Works</h2>
+    <div class="steps">
+      <div class="card">1️⃣ Post a Job<br>Need help? Post in seconds.</div>
+      <div class="card">2️⃣ Get Matched<br>Local hustlers accept the task.</div>
+      <div class="card">3️⃣ Get Paid Instantly<br>Secure FNB wallet, no cash needed.</div>
     </div>
+  </section>
+
+  <section class="section">
+    <h2>Features</h2>
+    <div class="features">
+      <div class="card"><i class="ri-user-3-line"></i> Verified Hustler Profiles</div>
+      <div class="card"><i class="ri-star-line"></i> Ratings & Reviews</div>
+      <div class="card"><i class="ri-money-dollar-circle-line"></i> Earnings Dashboard</div>
+      <div class="card"><i class="ri-flashlight-line"></i> Instant FNB Payments</div>
+    </div>
+  </section>
+
+  <div class="impact">
+    Empowering South Africa’s hustlers, one job at a time.
   </div>
-</header>
 
-<script></script>
+  <section class="section" id="wallet">
+    <h2>Wallet Preview</h2>
+    <div class="card wallet-card">
+      <h3>Wallet Balance: R1,250.00</h3>
+      <p>Jobs Completed: 5</p>
+      <p>💡 Tip: Save 10% for future goals.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>Powered by FNB for secure payments.</p>
+    <p>
+      <a href="#">About</a> | <a href="#">Contact</a> | <a href="#">Privacy</a> | <a href="#">Terms</a>
+    </p>
+  </footer>
+
+  <script>
+    const hamburger = document.querySelector('.hamburger');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    hamburger.addEventListener('click', () => {
+      mobileMenu.classList.toggle('active');
+    });
+  </script>
 </body>
 </html>
