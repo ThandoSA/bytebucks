@@ -31,92 +31,59 @@
   <!-- ===== POST JOB FORM ===== -->
   <section class="form-section">
     <h2>Post a New Job</h2>
-    <form id="postjob-form" class="postjob-form">
-      <label for="jobTitle">Job Title</label>
-      <input type="text" id="jobTitle" name="jobTitle" placeholder="e.g., Graphic Design Task" required />
-
-      <label for="jobDescription">Job Description</label>
-      <textarea id="jobDescription" name="jobDescription" placeholder="Describe the task..." rows="5" required></textarea>
-
-      <label for="skills">Required Skills</label>
-      <input type="text" id="skills" name="skills" placeholder="e.g., Photoshop, Video Editing" required />
-
-      <label for="location">Location</label>
-      <input type="text" id="location" name="location" placeholder="City / Town" required />
-
-      <label for="budget">Budget (ZAR)</label>
-      <input type="number" id="budget" name="budget" placeholder="e.g., 500" required />
-
-      <button type="submit" class="btn">Post Job</button>
-      <p>Go back to <a href="dashboard.html">Dashboard</a></p>
-    </form>
+  <form id="postjob-form" class="postjob-form">
+  <input type="text" name="title" placeholder="Job Title" required />
+  <textarea name="description" placeholder="Job Description" required></textarea>
+  <input type="text" name="location" placeholder="Location" required />
+  <input type="text" name="payment" placeholder="Payment (Hourly/Fixed)" required />
+  <select name="availability" required>
+    <option value="">--Select Availability--</option>
+    <option value="Full-time">Full-time</option>
+    <option value="Part-time">Part-time</option>
+  </select>
+  <button type="submit">Post Job</button>
+</form>
   </section>
 
-  <script>
-  // Select the form element by its ID
-  document.getElementById("postjob-form").addEventListener("submit", function(e) {
-  // Prevent the default form submission (page reload)
+  <!-- ===== SCRIPT ===== -->
+   <script>
+const form = document.getElementById("postjob-form");
+
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // Get input values from the form
-  const title = document.querySelector('input[name="title"]').value;
-  const description = document.querySelector('textarea[name="description"]').value;
-  const budget = document.querySelector('input[name="budget"]').value;
+  // Grab values from the form
+  const data = {
+    title: form.title.value.trim(),
+    description: form.description.value.trim(),
+    location: form.location.value.trim(),
+    payment: form.payment.value.trim(),
+    availability: form.availability.value
+  };
 
-  // Validate that all fields are filled
-  if (!title || !description || !budget) {
+  // Simple validation
+  if (!data.title || !data.description || !data.location || !data.payment || !data.availability) {
     alert("Please fill in all fields!");
-    return; // Stop the function if validation fails
+    return;
   }
 
-  // Retrieve existing jobs from localStorage or start with an empty array
-  const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
+  try {
+    const res = await fetch("http://localhost:5000/api/jobs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
 
-  // Add a new job object to the array
-  jobs.push({
-    title: title,                        // Job title from form
-    description: description,            // Job description from form
-    budget: budget,                      // Job budget from form
-    postedBy: localStorage.getItem("userName") || "Anonymous", // Name of user posting
-    date: new Date().toLocaleString()    // Timestamp of job posting
-  });
+    if (!res.ok) throw new Error("Failed to post job");
 
-    // Save the updated jobs array back to localStorage
-    localStorage.setItem("jobs", JSON.stringify(jobs));
-
-    // Notify the user that the job was posted successfully
     alert("Job posted successfully!");
+    form.reset();
 
-    // Reset the form so fields are cleared for next input
-    document.getElementById("postjob-form").reset();
+  } catch (err) {
+    console.error(err);
+    alert("Error posting job. Check server.");
+  }
 });
-    // Form submission
-    document.getElementById("postjob-form").addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      // Capture form values
-      const jobTitle = document.getElementById("jobTitle").value;
-      const jobDescription = document.getElementById("jobDescription").value;
-      const skills = document.getElementById("skills").value;
-      const location = document.getElementById("location").value;
-      const budget = document.getElementById("budget").value;
-
-      // Here you can save to database or localStorage (mock)
-      const job = { jobTitle, jobDescription, skills, location, budget };
-      let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
-      jobs.push(job);
-      localStorage.setItem("jobs", JSON.stringify(jobs));
-
-      alert("Job posted successfully!");
-      this.reset();
-    });
-
-    // Hamburger toggle
-    const hamburger = document.querySelector('.hamburger');
-    const mobileMenu = document.querySelector('.mobile-menu');
-    hamburger.addEventListener('click', () => {
-      mobileMenu.classList.toggle('active');
-    });
-  </script>
+</script>
 </body>
 </html>

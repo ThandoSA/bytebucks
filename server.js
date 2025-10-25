@@ -13,6 +13,10 @@ app.use(cors());
 const userRoutes = require("./routes/userRoutes");
 app.use("/api/users", userRoutes);
 
+// Import job routes
+const jobRoutes = require("./routes/jobRoutes");
+app.use("/api/jobs", jobRoutes);
+
 // Default route
 app.get("/", (req, res) => {
   res.send("Welcome to the Side Hustle Hub backend!");

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jobs Board | Side Hustle Hub</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="container header-container">
+        <div class="logo">
+            <h1><i class="ri-dashboard-line"></i>Side Hustle Hub - Jobs Board</h1>
+        </div>
+    <nav class="nav-desktop">
+      <a href="index.html">Home</a>
+      <a href="findwork.html">Find Work</a>
+      <a href="postajob.html">Post Job</a>
+      <a href="jobs.html" class="active">Jobs Board</a>
+    </nav>
+    </div>
+  </header>
+
+ <section class="section">
+  <h2>Available Jobs</h2>
+
+  <div class="filters">
+    <input type="text" id="search-title" placeholder="Search by job title..." />
+    <input type="text" id="search-location" placeholder="Search by location..." />
+    <select id="filter-payment">
+      <option value="">All Payments</option>
+      <option value="Hourly">Hourly</option>
+      <option value="Fixed">Fixed</option>
+    </select>
+    <select id="filter-availability">
+      <option value="">All Availability</option>
+      <option value="Full-time">Full-time</option>
+      <option value="Part-time">Part-time</option>
+    </select>
+    <button id="filter-btn">Filter</button>
+  </div>
+
+  <div id="jobs-list"></div>
+</section>
+
+<script>
+  const jobsList = document.getElementById("jobs-list");
+  const searchTitle = document.getElementById("search-title");
+  const searchLocation = document.getElementById("search-location");
+  const filterPayment = document.getElementById("filter-payment");
+  const filterAvailability = document.getElementById("filter-availability");
+  const filterBtn = document.getElementById("filter-btn");
+
+  let jobs = [];
+
+  // Fetch jobs from backend
+  async function fetchJobs() {
+    const res = await fetch("http://localhost:5000/api/jobs");
+    jobs = await res.json();
+    displayJobs(jobs);
+  }
+
+  function displayJobs(list) {
+    jobsList.innerHTML = list
+      .map(job => `
+        <div class="card">
+          <h3>${job.title}</h3>
+          <p><strong>Location:</strong> ${job.location}</p>
+          <p><strong>Payment:</strong> ${job.payment}</p>
+          <p><strong>Availability:</strong> ${job.availability}</p>
+          <p>${job.description}</p>
+        </div>
+      `).join("");
+  }
+
+  // Filter jobs
+  filterBtn.addEventListener("click", () => {
+    let filtered = jobs.filter(job => {
+      return (
+        (searchTitle.value === "" || job.title.toLowerCase().includes(searchTitle.value.toLowerCase())) &&
+        (searchLocation.value === "" || job.location.toLowerCase().includes(searchLocation.value.toLowerCase())) &&
+        (filterPayment.value === "" || job.payment === filterPayment.value) &&
+        (filterAvailability.value === "" || job.availability === filterAvailability.value)
+      );
+    });
+    displayJobs(filtered);
+  });
+
+  fetchJobs();
+</script>
+ 
+</body>
+</html>
