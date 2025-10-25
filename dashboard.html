@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | Side Hustle Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1><i class="ri-dashboard-line"></i> My Dashboard</h1>
+    <button onclick="logout()" class="btn logout-btn"><i class="ri-logout-box-r-line"></i> Logout</button>
+  </header>
+
+  <section class="dashboard">
+    <h2>Welcome back, <span id="username">Hustler</span> 👋</h2>
+    <div class="dashboard-cards">
+      <div class="card"><i class="ri-wallet-3-line"></i><h3>Earnings</h3><p>R2,750</p></div>
+      <div class="card"><i class="ri-briefcase-line"></i><h3>Jobs Completed</h3><p>7</p></div>
+      <div class="card"><i class="ri-star-smile-line"></i><h3>Rating</h3><p>4.8 ⭐</p></div>
+    </div>
+  </section>
+
+  <script>
+    const name = localStorage.getItem("userName") || "Hustler";
+    document.getElementById("username").textContent = name;
+
+    function logout() {
+      localStorage.removeItem("userName");
+      alert("You have logged out successfully!");
+      window.location.href = "signin.html";
+    }
+  </script>
+</body>
+</html>
