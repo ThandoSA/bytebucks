@@ -9,22 +9,24 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- HEADER -->
   <header>
     <div class="container header-container">  
-        <div class="logo">  
-    <h1><i class="ri-briefcase-line"></i> Side Hustle Hub</h1>
-    </div>
-    <nav class="nav-desktop">
-      <a href="index.html">Home</a>
-      <a href="findwork.html">Find Work</a>
-      <a href="postajob.html" class="active">Post Job</a>
-    </nav>
+      <div class="logo">  
+        <h1><i class="ri-briefcase-line"></i> Side Hustle Hub</h1>
+      </div>
+      <nav class="nav-desktop">
+        <a href="index.html">Home</a>
+        <a href="findwork.html">Find Work</a>
+        <a href="postajob.html">Post Job</a>
+      </nav>
     </div>
   </header>
 
+  <!-- SIGNUP FORM -->
   <section class="form-section">
     <h2>Create Account</h2>
-    <form id="signup-form">
+    <form id="signup-form" class="signup-form">
       <input type="text" name="name" placeholder="Full Name" required />
       <input type="email" name="email" placeholder="Email Address" required />
       <input type="password" name="password" placeholder="Password" required />
@@ -41,23 +43,29 @@
     </form>
   </section>
 
+  <!-- SCRIPT -->
   <script>
-    document.getElementById("signup-form").addEventListener("submit", function(e) {
+    const form = document.getElementById("signup-form");
+
+    form.addEventListener("submit", function(e) {
       e.preventDefault();
-      const name = document.querySelector('input[name="name"]').value;
+
+      // Get the user's name and type
+      const name = form.name.value.trim();
+      const userType = form.userType.value;
+
+      if(!userType) {
+        alert("Please select whether you are a Hustler or Client.");
+        return;
+      }
+
+      // Save to localStorage
       localStorage.setItem("userName", name);
-      alert("Signup successful! Redirecting to your dashboard...");
+      localStorage.setItem("userType", userType);
+
+      alert(`Welcome ${name}! Redirecting to your dashboard...`);
       window.location.href = "dashboard.html";
     });
-
-    function signup() {
-    const name = document.getElementById("name").value;
-    if(name) {
-      localStorage.setItem("userName", name);
-      alert("Signup successful!");
-      window.location.href = "dashboard.html";
-    }
-  }
   </script>
 </body>
 </html>

@@ -703,3 +703,62 @@ form p a:hover {
     padding: 1.5rem;
   }
 }
+
+/* Hero buttons as links */
+.hero .btn {
+  display: inline-block;
+  background: #ff9800;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  margin: 0.5rem;
+  transition: 0.3s;
+}
+
+.hero .btn:hover {
+  background: #e68900;
+  transform: translateY(-2px);
+}
+
+/* About Section Layout */
+.about-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.about-text {
+  flex: 1 1 300px;
+  min-width: 280px;
+}
+
+.about-image {
+  flex: 1 1 300px;
+  min-width: 280px;
+}
+
+.about-image img {
+  max-width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Section Titles */
+.section h2 {
+  color: #004080;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Mobile Fix */
+@media (max-width: 768px) {
+  .about-container {
+    flex-direction: column;
+  }
+}
