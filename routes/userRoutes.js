@@ -1,58 +1,72 @@
-// Import dependencies
 const express = require("express");
 const router = express.Router();
-const User = require("../models/User"); // Import the User model
+const User = require("../models/User");
+const bcrypt = require("bcrypt");
 
-/**
- * @route   POST /api/users
- * @desc    Create a new user
- * @access  Public
- */
-router.post("/", async (req, res) => {
+// CREATE a new user (signup)
+router.post("/signup", async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, password, userType } = req.body;
 
-    // Validate input
-    if (!name || !email) {
-      return res.status(400).json({ message: "Name and email are required" });
+    if (!name || !email || !password || !userType) {
+      return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Save user to database
-    const user = new User({ name, email });
+    // Check if user exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).json({ message: "Email already in use" });
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({ name, email, password: hashedPassword, userType });
     await user.save();
 
-    res.status(201).json({
-      message: "✅ User created successfully",
-      user,
+    res.status(201).json({ message: "User created successfully", user: { name, email, userType } });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// LOGIN route
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "Invalid email or password" });
+
+    // Compare password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
+
+    // Return user info
+    res.json({
+      message: "Login successful",
+      user: { name: user.name, email: user.email, userType: user.userType }
     });
   } catch (error) {
-    console.error("❌ Error saving user:", error);
+    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-/**
- * @route   GET /api/users
- * @desc    Fetch all users
- * @access  Public
- */
+// Get user by email
 router.get("/", async (req, res) => {
   try {
-    const users = await User.find();
-    res.json(users);
+    const { email } = req.query;
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ user });
   } catch (error) {
-    console.error("❌ Error fetching users:", error);
+    console.error("Error fetching user:", error);
     res.status(500).json({ message: "Server error" });
   }
-});
-
-/**
- * @route   GET /api/users/test
- * @desc    Test route to verify user routes work
- * @access  Public
- */
-router.get("/test", (req, res) => {
-  res.send("✅ User route working!");
 });
 
 module.exports = router;

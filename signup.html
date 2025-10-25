@@ -47,53 +47,47 @@
   <script>
     const form = document.getElementById("signup-form");
 
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
+  form.addEventListener("submit", async function(e) {
+    e.preventDefault();
 
-      // Get the user's name and type
-      const name = form.name.value.trim();
-      const userType = form.userType.value;
+    // Get form values
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const password = form.password.value;
+    const userType = form.userType.value;
 
-      if(!userType) {
-        alert("Please select whether you are a Hustler or Client.");
+    if (!name || !email || !password || !userType) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    try {
+      // Send POST request to backend
+      const res = await fetch("http://localhost:5000/api/users/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password, userType })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message || "Signup failed.");
         return;
       }
 
-      // Save to localStorage
-      localStorage.setItem("userName", name);
-      localStorage.setItem("userType", userType);
+      // Save user info in localStorage (optional for frontend)
+      localStorage.setItem("userName", data.user.name);
+      localStorage.setItem("userType", data.user.userType);
 
-      alert(`Welcome ${name}! Redirecting to your dashboard...`);
+      alert(`Welcome ${data.user.name}! Redirecting to your dashboard...`);
       window.location.href = "dashboard.html";
-    });
-    
-     // Select the signup form by ID and attach a submit event listener
-    document.getElementById("signup-form").addEventListener("submit", function(e) {
-      // Prevent the form from submitting normally (page reload)
-      e.preventDefault();
 
-      // Get the value of the user's name input field
-      const name = document.querySelector('input[name="name"]').value;
-
-      // Store the user's name in localStorage to keep track of the logged-in user
-      localStorage.setItem("userName", name);
-
-      // Notify the user of successful signup
-      alert("Signup successful! Redirecting to your dashboard...");
-
-      // Redirect the user to the dashboard page
-      window.location.href = "dashboard.html";
-    });
-
-    // Optional standalone function (not used by current form, could be removed)
-    function signup() {
-      const name = document.getElementById("name").value;
-      if(name) {
-        localStorage.setItem("userName", name);
-        alert("Signup successful!");
-        window.location.href = "dashboard.html";
-      }
+    } catch (err) {
+      console.error(err);
+      alert("An error occurred. Please try again.");
     }
+  });
   </script>
 </body>
 </html>

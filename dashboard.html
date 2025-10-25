@@ -33,36 +33,45 @@
   </section>
 
   <script>
-    // Get user info from localStorage
-    const name = localStorage.getItem("userName") || "Hustler";
-    const userType = localStorage.getItem("userType") || "Hustler";
-    document.getElementById("username").textContent = `${name} (${userType})`;
+     // Get user info from localStorage (email or ID could also be stored)
+  const userName = localStorage.getItem("userName");
 
-    const cardsContainer = document.querySelector('.dashboard-cards');
+  // Display a welcome message
+  const welcomeElement = document.getElementById("welcome-msg");
+  if (welcomeElement) {
+    welcomeElement.textContent = `Welcome, ${userName || "Hustler"}!`;
+  }
 
-    // Display different cards based on user type
-    if(userType === "client") {
-      cardsContainer.innerHTML = `
-        <div class="card"><i class="ri-briefcase-line"></i><h3>Jobs Posted</h3><p>5</p></div>
-        <div class="card"><i class="ri-user-line"></i><h3>Hustlers Hired</h3><p>3</p></div>
-        <div class="card"><i class="ri-money-dollar-circle-line"></i><h3>Total Spent</h3><p>R4,200</p></div>
-      `;
-    } else {
-      // Hustler view
-      cardsContainer.innerHTML = `
-        <div class="card"><i class="ri-wallet-3-line"></i><h3>Earnings</h3><p>R2,750</p></div>
-        <div class="card"><i class="ri-briefcase-line"></i><h3>Jobs Completed</h3><p>7</p></div>
-        <div class="card"><i class="ri-star-smile-line"></i><h3>Rating</h3><p>4.8 ⭐</p></div>
-      `;
+  // Optionally fetch full user info from backend using email
+  async function fetchUserData() {
+    try {
+      // Assume email is stored in localStorage during login/signup
+      const email = localStorage.getItem("userEmail");
+      if (!email) return;
+
+      const res = await fetch(`http://localhost:5000/api/users?email=${email}`);
+      const data = await res.json();
+
+      if (res.ok && data.user) {
+        // Update UI with actual data from MongoDB
+        welcomeElement.textContent = `Welcome, ${data.user.name}!`;
+      }
+
+    } catch (err) {
+      console.error("Error fetching user data:", err);
     }
+  }
 
-    // Logout function
-    function logout() {
-      localStorage.removeItem("userName");
-      localStorage.removeItem("userType");
-      alert("You have logged out successfully!");
-      window.location.href = "index.html";
-    }
+  fetchUserData();
+
+  // Logout button
+  const logoutBtn = document.getElementById("logout-btn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      localStorage.clear();
+      window.location.href = "login.html";
+    });
+  }
   </script>
 </body>
 </html>
