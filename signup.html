@@ -66,6 +66,34 @@
       alert(`Welcome ${name}! Redirecting to your dashboard...`);
       window.location.href = "dashboard.html";
     });
+    
+     // Select the signup form by ID and attach a submit event listener
+    document.getElementById("signup-form").addEventListener("submit", function(e) {
+      // Prevent the form from submitting normally (page reload)
+      e.preventDefault();
+
+      // Get the value of the user's name input field
+      const name = document.querySelector('input[name="name"]').value;
+
+      // Store the user's name in localStorage to keep track of the logged-in user
+      localStorage.setItem("userName", name);
+
+      // Notify the user of successful signup
+      alert("Signup successful! Redirecting to your dashboard...");
+
+      // Redirect the user to the dashboard page
+      window.location.href = "dashboard.html";
+    });
+
+    // Optional standalone function (not used by current form, could be removed)
+    function signup() {
+      const name = document.getElementById("name").value;
+      if(name) {
+        localStorage.setItem("userName", name);
+        alert("Signup successful!");
+        window.location.href = "dashboard.html";
+      }
+    }
   </script>
 </body>
 </html>

@@ -53,6 +53,43 @@
   </section>
 
   <script>
+  // Select the form element by its ID
+  document.getElementById("postjob-form").addEventListener("submit", function(e) {
+  // Prevent the default form submission (page reload)
+  e.preventDefault();
+
+  // Get input values from the form
+  const title = document.querySelector('input[name="title"]').value;
+  const description = document.querySelector('textarea[name="description"]').value;
+  const budget = document.querySelector('input[name="budget"]').value;
+
+  // Validate that all fields are filled
+  if (!title || !description || !budget) {
+    alert("Please fill in all fields!");
+    return; // Stop the function if validation fails
+  }
+
+  // Retrieve existing jobs from localStorage or start with an empty array
+  const jobs = JSON.parse(localStorage.getItem("jobs") || "[]");
+
+  // Add a new job object to the array
+  jobs.push({
+    title: title,                        // Job title from form
+    description: description,            // Job description from form
+    budget: budget,                      // Job budget from form
+    postedBy: localStorage.getItem("userName") || "Anonymous", // Name of user posting
+    date: new Date().toLocaleString()    // Timestamp of job posting
+  });
+
+    // Save the updated jobs array back to localStorage
+    localStorage.setItem("jobs", JSON.stringify(jobs));
+
+    // Notify the user that the job was posted successfully
+    alert("Job posted successfully!");
+
+    // Reset the form so fields are cleared for next input
+    document.getElementById("postjob-form").reset();
+});
     // Form submission
     document.getElementById("postjob-form").addEventListener("submit", function(e) {
       e.preventDefault();

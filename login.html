@@ -51,6 +51,37 @@
       alert(`Welcome back, ${name}! Redirecting to your dashboard...`);
       window.location.href = "dashboard.html";
     });
+
+      // Select the login form by its ID and attach a submit event listener
+  document.getElementById("signin-form").addEventListener("submit", function(e) {
+    // Prevent the default form submission (page reload)
+    e.preventDefault();
+
+    // Get the value entered in the email input field
+    const email = document.querySelector('input[name="email"]').value;
+
+    // Extract the prefix of the email (everything before '@') to use as a username
+    const name = email.split("@")[0];
+
+    // Store the username in localStorage so it can be used on other pages
+    localStorage.setItem("userName", name);
+
+    // Notify the user that login was successful
+    alert("Welcome back! Redirecting to your dashboard...");
+
+    // Redirect the user to the dashboard page
+    window.location.href = "dashboard.html";
+  });
+
+  // Optional standalone login function (not used by current form)
+  // This function is meant to handle login if called separately
+  function login() {
+    const name = document.getElementById("name").value; // Get the user's name
+    if(name) {
+      localStorage.setItem("userName", name); // Store in localStorage
+      window.location.href = "dashboard.html"; // Redirect to dashboard
+    }
+  }
   </script>
 </body>
 </html>
