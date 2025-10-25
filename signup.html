@@ -49,6 +49,15 @@
       alert("Signup successful! Redirecting to your dashboard...");
       window.location.href = "dashboard.html";
     });
+
+    function signup() {
+    const name = document.getElementById("name").value;
+    if(name) {
+      localStorage.setItem("userName", name);
+      alert("Signup successful!");
+      window.location.href = "dashboard.html";
+    }
+  }
   </script>
 </body>
 </html>

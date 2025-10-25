@@ -10,7 +10,16 @@
 </head>
 <body>
   <header>
+     <div class="container header-container">  
+        <div class="logo">  
     <h1><i class="ri-dashboard-line"></i> My Dashboard</h1>
+    </div>
+    <nav class="nav-desktop">
+      <a href="index.html">Home</a>
+      <a href="findwork.html">Find Work</a>
+      <a href="postajob.html" class="active">Post Job</a>
+    </nav>
+    </div>
     <button onclick="logout()" class="btn logout-btn"><i class="ri-logout-box-r-line"></i> Logout</button>
   </header>
 
@@ -24,13 +33,14 @@
   </section>
 
   <script>
+    // Get the user's name from localStorage
     const name = localStorage.getItem("userName") || "Hustler";
     document.getElementById("username").textContent = name;
 
     function logout() {
       localStorage.removeItem("userName");
       alert("You have logged out successfully!");
-      window.location.href = "signin.html";
+      window.location.href = "index.html";
     }
   </script>
 </body>

@@ -41,6 +41,14 @@
       alert("Welcome back! Redirecting to your dashboard...");
       window.location.href = "dashboard.html";
     });
+
+    function login() {
+    const name = document.getElementById("name").value;
+    if(name) {
+      localStorage.setItem("userName", name);
+      window.location.href = "dashboard.html";
+    }
+  }
   </script>
 </body>
 </html>
