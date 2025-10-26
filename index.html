@@ -109,29 +109,43 @@
 
   <!-- SCRIPT -->
   <script>
-    const hamburger = document.querySelector('.hamburger');
-    const mobileMenu = document.querySelector('.mobile-menu');
-    hamburger.addEventListener('click', () => {
+  const hamburger = document.querySelector('.hamburger');
+  const mobileMenu = document.querySelector('.mobile-menu');
+
+  // Toggle mobile menu
+  hamburger.addEventListener('click', () => {
     mobileMenu.classList.toggle('active');
-    });
+  });
 
-    // Dynamically switch login/signup to logout/dashboard if user is logged in
-    const userName = localStorage.getItem("userName");
-    const authButtons = document.getElementById("auth-buttons");
-    if (userName && authButtons) {
-     authButtons.innerHTML = `
-    <a href="dashboard.html" class="btn dashboard-btn">Dashboard</a>
-    <button class="btn logout-btn" onclick="logout()">Logout</button>
-    `;
-}
+  // Logout function
+  function logout() {
+    localStorage.clear();
+    window.location.href = "index.html";
+  }
 
-// Logout function
-function logout() {
-  localStorage.clear();
-  window.location.href = "index.html";
-}
+  // Dynamically switch login/signup to dashboard/logout if user is logged in
+  const userName = localStorage.getItem("userName");
 
+  const authButtonsDesktop = document.getElementById("auth-buttons");
+  const authButtonsMobile = document.querySelector(".mobile-menu .auth-buttons");
 
-  </script>
+  if (userName) {
+    // Update desktop auth buttons
+    if (authButtonsDesktop) {
+      authButtonsDesktop.innerHTML = `
+        <a href="dashboard.html" class="btn dashboard-btn">Dashboard</a>
+        <button class="btn logout-btn" onclick="logout()">Logout</button>
+      `;
+    }
+
+    // Update mobile auth buttons
+    if (authButtonsMobile) {
+      authButtonsMobile.innerHTML = `
+        <a href="dashboard.html" class="btn dashboard-btn">Dashboard</a>
+        <button class="btn logout-btn" onclick="logout()">Logout</button>
+      `;
+    }
+  }
+</script>
 </body>
 </html>
