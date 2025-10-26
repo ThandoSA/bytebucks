@@ -19,7 +19,7 @@ app.use("/api/jobs", jobRoutes);
 
 // Default route
 app.get("/", (req, res) => {
-  res.send("Welcome to the Side Hustle Hub backend!");
+res.send("Welcome to the Side Hustle Hub backend!");
 });
 
 // Connect to MongoDB
