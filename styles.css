@@ -977,3 +977,35 @@ canvas {
   text-align: center;
 }
 
+/* ===== HIDE DESKTOP AUTH BUTTONS ON MOBILE ===== */
+@media (max-width: 768px) {
+  #auth-buttons-desktop {
+    display: none !important;
+  }
+
+  /* Make sure mobile auth buttons look good */
+  .mobile-menu .auth-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: 1rem;
+    padding: 0 1rem;
+  }
+
+  .mobile-menu .btn-signup,
+  .mobile-menu .btn-signin {
+    width: 100%;
+    text-align: center;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+}
+
+.mobile-menu {
+  display: none;
+}
+
+.mobile-menu.active {
+  display: block;
+}

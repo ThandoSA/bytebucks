@@ -24,7 +24,7 @@
         <a href="postajob.html">Post a Job</a>
         <a href="#about">About</a>
       </nav>
-      <div class="auth-buttons" id="auth-buttons">
+      <div class="auth-buttons" id="auth-buttons-desktop">
         <a href="signup.html" class="btn btn-signup"><i class="ri-user-add-line"></i> Sign Up</a>
         <a href="login.html" class="btn btn-signin"><i class="ri-login-box-line"></i> Login</a>
       </div>
@@ -112,7 +112,7 @@
     const hamburger = document.querySelector('.hamburger');
     const mobileMenu = document.querySelector('.mobile-menu');
     hamburger.addEventListener('click', () => {
-      mobileMenu.classList.toggle('active');
+    mobileMenu.classList.toggle('active');
     });
 
     // Dynamically switch login/signup to logout/dashboard if user is logged in
