@@ -7,6 +7,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .job-chat { border-top: 1px solid #ccc; padding-top: 10px; margin-top: 10px; }
+    .online-users { font-size: 12px; color: green; margin-bottom: 5px; }
+    .chat-messages { max-height: 150px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; background:#f9f9f9; }
+    .chat-input { display: flex; gap: 5px; }
+    .chat-input input { flex: 1; padding: 5px; }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: #4CAF50; color: white; padding: 10px 15px; border-radius: 5px; display: none; z-index: 9999; }
+  </style>
 </head>
 <body>
   <!-- HEADER -->
@@ -47,11 +55,14 @@
     </div>
 
     <div id="jobs-list" class="jobs-list"></div>
-
-    <div id="total-display" class="total-display"></div>
   </section>
 
+  <div id="toast" class="toast"></div>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
+    const socket = io("http://localhost:5000"); // Connect to Socket.IO server
+
     const jobsList = document.getElementById("jobs-list");
     const searchTitle = document.getElementById("search-title");
     const searchLocation = document.getElementById("search-location");
@@ -59,11 +70,11 @@
     const filterAvailability = document.getElementById("filter-availability");
     const filterBtn = document.getElementById("filter-btn");
     const logoutBtn = document.getElementById("logout-btn");
-    const totalDisplay = document.getElementById("total-display");
+
+    const username = localStorage.getItem("userName") || "Anonymous";
+    const userType = localStorage.getItem("userType") || "hustler";
 
     let jobs = [];
-    const userType = localStorage.getItem("userType");
-    const userName = localStorage.getItem("userName");
 
     // Logout
     logoutBtn.addEventListener("click", () => {
@@ -71,88 +82,137 @@
       window.location.href = "login.html";
     });
 
-    // Fetch jobs from backend
+    // Toast notification
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.style.display = "block";
+      setTimeout(() => { toast.style.display = "none"; }, 3000);
+    }
+
+    // Fetch jobs
     async function fetchJobs() {
       try {
         const res = await fetch("http://localhost:5000/api/jobs");
         if (!res.ok) throw new Error("Failed to fetch jobs");
-
         jobs = await res.json();
         displayJobs(jobs);
-        displayTotal(jobs);
+        joinChatRooms();
       } catch (err) {
         console.error(err);
         jobsList.innerHTML = "<p>Unable to load jobs. Please try again later.</p>";
       }
     }
 
-    // Display jobs
+    // Display jobs with apply button and chat
     function displayJobs(list) {
       if (list.length === 0) {
         jobsList.innerHTML = "<p>No jobs found matching your criteria.</p>";
         return;
       }
 
-      jobsList.innerHTML = list.map(job => `
-        <div class="card">
-          <h3>${job.title}</h3>
-          <p><strong>Location:</strong> ${job.location}</p>
-          <p><strong>Payment:</strong> R${job.payment}</p>
-          <p><strong>Availability:</strong> ${job.availability}</p>
-          <p>${job.description}</p>
-          <p><em>Posted by: ${job.postedBy || "Anonymous"}</em></p>
-          ${userType === "hustler" && !job.assignedTo ? `<button onclick="acceptJob('${job._id}')">Accept Job</button>` : ''}
-          ${job.assignedTo ? `<p><strong>Assigned To:</strong> ${job.assignedTo}</p>` : ''}
-        </div>
-      `).join("");
-    }
+      jobsList.innerHTML = list.map(job => {
+        let applyBtn = "";
+        if (userType === "hustler" && !(job.appliedBy?.includes(username))) {
+          applyBtn = `<button class="btn apply-btn" data-id="${job._id}">Apply</button>`;
+        } else if (userType === "hustler") {
+          applyBtn = "<p>✅ Applied</p>";
+        }
 
-    // Accept job (for hustlers)
-    async function acceptJob(jobId) {
-      try {
-        await fetch(`http://localhost:5000/api/jobs/${jobId}/accept`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ assignedTo: userName })
+        return `
+          <div class="card">
+            <h3>${job.title}</h3>
+            <p><strong>Location:</strong> ${job.location}</p>
+            <p><strong>Payment:</strong> R${job.payment}</p>
+            <p><strong>Availability:</strong> ${job.availability}</p>
+            <p>${job.description}</p>
+            <p><em>Posted by: ${job.postedBy || "Anonymous"}</em></p>
+            ${applyBtn}
+            <div class="job-chat">
+              <div class="online-users" id="online-users-${job._id}">Online: </div>
+              <div class="chat-messages" id="chat-messages-${job._id}"></div>
+              <div class="chat-input">
+                <input type="text" id="chat-input-${job._id}" placeholder="Type a message..." />
+                <button onclick="sendMessage('${job._id}')"><i class="ri-send-plane-line"></i></button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      // Attach apply button events
+      document.querySelectorAll(".apply-btn").forEach(button => {
+        button.addEventListener("click", async (e) => {
+          const jobId = e.target.dataset.id;
+          try {
+            const res = await fetch(`http://localhost:5000/api/jobs/apply/${jobId}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username })
+            });
+            const data = await res.json();
+            if (res.ok) {
+              showToast("Applied successfully!");
+              fetchJobs(); // refresh
+            } else {
+              alert(data.message || "Failed to apply");
+            }
+          } catch (err) {
+            console.error(err);
+            alert("Server error. Try again later.");
+          }
         });
-        alert("Job accepted!");
-        fetchJobs(); // refresh
-      } catch (err) {
-        console.error(err);
-        alert("Failed to accept job.");
-      }
-    }
-
-    // Display total earnings/spent
-    function displayTotal(allJobs) {
-      let total = 0;
-      if (userType === "hustler") {
-        const userJobs = allJobs.filter(job => job.assignedTo === userName);
-        total = userJobs.reduce((sum, job) => sum + Number(job.payment), 0);
-        totalDisplay.innerHTML = `<p>Total Earnings: R${total}</p>`;
-      } else if (userType === "client") {
-        const clientJobs = allJobs.filter(job => job.postedBy === userName);
-        total = clientJobs.reduce((sum, job) => sum + Number(job.payment), 0);
-        totalDisplay.innerHTML = `<p>Total Spent: R${total}</p>`;
-      }
+      });
     }
 
     // Filter jobs
     filterBtn.addEventListener("click", () => {
-      const filtered = jobs.filter(job => {
-        return (
-          (searchTitle.value === "" || job.title.toLowerCase().includes(searchTitle.value.toLowerCase())) &&
-          (searchLocation.value === "" || job.location.toLowerCase().includes(searchLocation.value.toLowerCase())) &&
-          (filterPayment.value === "" || job.payment === filterPayment.value) &&
-          (filterAvailability.value === "" || job.availability === filterAvailability.value)
-        );
-      });
-
+      const filtered = jobs.filter(job => 
+        (searchTitle.value === "" || job.title.toLowerCase().includes(searchTitle.value.toLowerCase())) &&
+        (searchLocation.value === "" || job.location.toLowerCase().includes(searchLocation.value.toLowerCase())) &&
+        (filterPayment.value === "" || job.payment === filterPayment.value) &&
+        (filterAvailability.value === "" || job.availability === filterAvailability.value)
+      );
       displayJobs(filtered);
-      displayTotal(filtered);
+      joinChatRooms();
     });
 
-    // Initial fetch
+    // Join Socket.IO chat rooms
+    function joinChatRooms() {
+      jobs.forEach(job => {
+        socket.emit("joinRoom", { room: job._id, user: username });
+      });
+    }
+
+    // Listen for online users
+    socket.on("updateUsers", ({ room, users }) => {
+      const onlineDiv = document.getElementById(`online-users-${room}`);
+      if (onlineDiv) onlineDiv.textContent = `Online: ${users.join(", ")}`;
+    });
+
+    // Listen for chat messages
+    socket.on("chatMessage", ({ room, sender, message, time }) => {
+      const msgDiv = document.getElementById(`chat-messages-${room}`);
+      if (!msgDiv) return;
+
+      const p = document.createElement("p");
+      const timestamp = new Date(time).toLocaleTimeString();
+      p.innerHTML = `<strong>${sender}</strong> [${timestamp}]: ${message}`;
+      msgDiv.appendChild(p);
+      msgDiv.scrollTop = msgDiv.scrollHeight;
+
+      if (sender !== username) showToast(`New message from ${sender} in "${room}"`);
+    });
+
+    // Send chat message
+    function sendMessage(room) {
+      const input = document.getElementById(`chat-input-${room}`);
+      const message = input.value.trim();
+      if (!message) return;
+      socket.emit("chatMessage", { room, sender: username, message });
+      input.value = "";
+    }
+
     fetchJobs();
   </script>
 </body>

@@ -1,174 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Work | Side Hustle Hub</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <style>
-      /* Extra styling for Find Work page */
-      .filters {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin: 20px 0;
-      }
-      .filters input, .filters select {
-        padding: 10px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        flex: 1;
-        min-width: 150px;
-      }
-      .filters button {
-        padding: 10px 20px;
-        border: none;
-        background-color: #1a73e8;
-        color: #fff;
-        border-radius: 6px;
-        cursor: pointer;
-      }
-      #jobs-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 20px;
-      }
-      .card {
-        padding: 15px;
-        border-radius: 8px;
-        border: 1px solid #ddd;
-        background-color: #fff;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        transition: transform 0.2s;
-      }
-      .card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      }
-      .card h3 {
-        margin-bottom: 8px;
-        color: #1a73e8;
-      }
-      .card p {
-        margin: 4px 0;
-        font-size: 0.9rem;
-        color: #333;
-      }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find Work | Side Hustle Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- ===== HEADER ===== -->
-    <header>
-        <div class="container header-container">
-            <div class="logo">
-                <h1><i class="ri-briefcase-line"></i> Side Hustle Hub</h1>
-            </div>
-            <nav class="nav-desktop">
-                <a href="index.html">Home</a>
-                <a href="findwork.html" class="active">Find Work</a>
-                <a href="postajob.html">Post Job</a>
-                <a href="jobs.html">Jobs Board</a>
-            </nav>
-            <button onclick="logout()" class="btn logout-btn"><i class="ri-logout-box-r-line"></i> Logout</button>
+  <!-- HEADER -->
+  <header>
+    <div class="container header-container">
+      <div class="logo">
+        <h1><i class="ri-briefcase-line"></i> Side Hustle Hub</h1>
+      </div>
+      <nav class="nav-desktop">
+        <a href="index.html">Home</a>
+        <a href="findwork.html" class="active">Find Work</a>
+        <a href="postajob.html">Post Job</a>
+      </nav>
+      <button id="logout-btn" class="btn logout-btn"><i class="ri-logout-box-r-line"></i> Logout</button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h2>Find Work That Matches Your Skills</h2>
+    <p>Connect with local job providers and grow your side hustle.</p>
+  </section>
+
+  <!-- JOB LIST -->
+  <section class="section">
+    <h2>Available Jobs</h2>
+    <div class="filters">
+      <input type="text" id="search-title" placeholder="Search by job title..." />
+      <input type="text" id="search-location" placeholder="Search by location..." />
+      <select id="filter-availability">
+        <option value="">All Availability</option>
+        <option value="Full-time">Full-time</option>
+        <option value="Part-time">Part-time</option>
+      </select>
+      <button id="filter-btn" class="btn"><i class="ri-filter-line"></i> Filter</button>
+    </div>
+
+    <div id="jobs-list" class="jobs-list"></div>
+  </section>
+
+  <script>
+    const jobsList = document.getElementById("jobs-list");
+    const searchTitle = document.getElementById("search-title");
+    const searchLocation = document.getElementById("search-location");
+    const filterAvailability = document.getElementById("filter-availability");
+    const filterBtn = document.getElementById("filter-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+
+    const userEmail = localStorage.getItem("userEmail"); // Hustler's email
+
+    logoutBtn.addEventListener("click", () => {
+      localStorage.clear();
+      window.location.href = "login.html";
+    });
+
+    let jobs = [];
+
+    async function fetchJobs() {
+      try {
+        const res = await fetch("http://localhost:5000/api/jobs");
+        if (!res.ok) throw new Error("Failed to fetch jobs");
+        jobs = await res.json();
+        displayJobs(jobs);
+      } catch (err) {
+        console.error(err);
+        jobsList.innerHTML = "<p>Unable to load jobs. Please try again later.</p>";
+      }
+    }
+
+    function displayJobs(list) {
+      if (list.length === 0) {
+        jobsList.innerHTML = "<p>No jobs found matching your criteria.</p>";
+        return;
+      }
+
+      jobsList.innerHTML = list.map(job => `
+        <div class="card">
+          <h3>${job.title}</h3>
+          <p><strong>Location:</strong> ${job.location}</p>
+          <p><strong>Payment:</strong> R${job.payment}</p>
+          <p><strong>Availability:</strong> ${job.availability}</p>
+          <p>${job.description}</p>
+          <p><em>Posted by: ${job.postedBy || "Anonymous"}</em></p>
+          <button class="btn apply-btn" data-id="${job._id}"><i class="ri-hand-coin-line"></i> Apply</button>
         </div>
-    </header>
+      `).join("");
 
-    <!-- ===== HERO ===== -->
-    <section class="hero">
-        <h2>Find Work That Matches Your Skills</h2>
-        <p>Connect with local job providers and grow your side hustle.</p>
-    </section>
+      document.querySelectorAll(".apply-btn").forEach(btn => {
+        btn.addEventListener("click", applyToJob);
+      });
+    }
 
-    <!-- ===== JOB FILTERS ===== -->
-    <section class="section">
-        <h2><i class="ri-search-line"></i> Search Available Jobs</h2>
-        <div class="filters">
-            <input type="text" id="search-title" placeholder="Job title..." />
-            <input type="text" id="search-location" placeholder="Location..." />
-            <select id="filter-payment">
-                <option value="">All Payments</option>
-                <option value="Hourly">Hourly</option>
-                <option value="Fixed">Fixed</option>
-            </select>
-            <select id="filter-availability">
-                <option value="">All Availability</option>
-                <option value="Full-time">Full-time</option>
-                <option value="Part-time">Part-time</option>
-            </select>
-            <button id="filter-btn"><i class="ri-filter-line"></i> Filter</button>
-        </div>
-
-        <!-- Jobs list -->
-        <div id="jobs-list"></div>
-    </section>
-
-    <footer>
-        <p>© 2025 Side Hustle Hub | Empowering South Africa’s Hustlers</p>
-    </footer>
-
-    <script>
-        const jobsList = document.getElementById("jobs-list");
-        const searchTitle = document.getElementById("search-title");
-        const searchLocation = document.getElementById("search-location");
-        const filterPayment = document.getElementById("filter-payment");
-        const filterAvailability = document.getElementById("filter-availability");
-        const filterBtn = document.getElementById("filter-btn");
-
-        let jobs = [];
-
-        // Fetch jobs from backend
-        async function fetchJobs() {
-            try {
-                const res = await fetch("http://localhost:5000/api/jobs");
-                jobs = await res.json();
-                displayJobs(jobs);
-            } catch (err) {
-                console.error("Error fetching jobs:", err);
-                jobsList.innerHTML = "<p>Failed to load jobs. Please try again later.</p>";
-            }
-        }
-
-        // Display jobs dynamically
-        function displayJobs(list) {
-            if (!list.length) {
-                jobsList.innerHTML = "<p>No jobs found matching your filters.</p>";
-                return;
-            }
-            jobsList.innerHTML = list.map(job => `
-                <div class="card">
-                    <h3>${job.title}</h3>
-                    <p><strong>Location:</strong> ${job.location}</p>
-                    <p><strong>Payment:</strong> ${job.payment}</p>
-                    <p><strong>Availability:</strong> ${job.availability}</p>
-                    <p>${job.description}</p>
-                    <button class="btn apply-btn">Apply</button>
-                </div>
-            `).join("");
-        }
-
-        // Filter jobs
-        filterBtn.addEventListener("click", () => {
-            const filtered = jobs.filter(job => {
-                return (
-                    (!searchTitle.value || job.title.toLowerCase().includes(searchTitle.value.toLowerCase())) &&
-                    (!searchLocation.value || job.location.toLowerCase().includes(searchLocation.value.toLowerCase())) &&
-                    (!filterPayment.value || job.payment === filterPayment.value) &&
-                    (!filterAvailability.value || job.availability === filterAvailability.value)
-                );
-            });
-            displayJobs(filtered);
+    async function applyToJob(e) {
+      const jobId = e.target.getAttribute("data-id");
+      try {
+        const res = await fetch(`http://localhost:5000/api/jobs/apply/${jobId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ applicantEmail: userEmail })
         });
 
-        // Logout
-        function logout() {
-            localStorage.clear();
-            window.location.href = "login.html";
-        }
+        if (!res.ok) throw new Error("Failed to apply");
+        alert("Application successful!");
+        fetchJobs(); // refresh list
+      } catch (err) {
+        console.error(err);
+        alert("Error applying to job. Try again later.");
+      }
+    }
 
-        // Initial load
-        fetchJobs();
-    </script>
+    filterBtn.addEventListener("click", () => {
+      const filtered = jobs.filter(job => {
+        return (
+          (searchTitle.value === "" || job.title.toLowerCase().includes(searchTitle.value.toLowerCase())) &&
+          (searchLocation.value === "" || job.location.toLowerCase().includes(searchLocation.value.toLowerCase())) &&
+          (filterAvailability.value === "" || job.availability === filterAvailability.value)
+        );
+      });
+      displayJobs(filtered);
+    });
+
+    fetchJobs();
+  </script>
 </body>
 </html>

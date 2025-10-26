@@ -2,11 +2,12 @@ const mongoose = require("mongoose");
 
 const jobSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  description: { type: String, required: true },
-  location: { type: String, required: true },
-  payment: { type: String, required: true },
-  availability: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now }
-});
+  description: String,
+  location: String,
+  payment: { type: Number, required: true },
+  availability: String,
+  postedBy: String,       // client name
+  appliedBy: [String],    // list of hustlers who applied
+}, { timestamps: true });
 
 module.exports = mongoose.model("Job", jobSchema);

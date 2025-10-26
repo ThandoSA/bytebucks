@@ -7,6 +7,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .dashboard-cards { display: flex; flex-wrap: wrap; gap: 15px; }
+    .card { border: 1px solid #ccc; padding: 15px; border-radius: 8px; flex: 1 1 300px; background:#fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .earnings { font-size: 18px; font-weight: 600; margin-bottom: 10px; }
+    .applied-job { margin-bottom: 10px; }
+    .btn-chat { padding: 5px 10px; font-size: 14px; cursor: pointer; background:#4CAF50; color:white; border:none; border-radius:5px; }
+  </style>
 </head>
 <body>
   <!-- HEADER -->
@@ -24,89 +31,81 @@
     </div>
   </header>
 
-  <!-- DASHBOARD -->
-  <section class="dashboard section">
+  <!-- DASHBOARD SECTION -->
+  <section class="dashboard">
     <h2>Welcome back, <span id="username"></span> 👋</h2>
 
-    <div class="dashboard-cards">
-      <div class="card">
-        <h3 id="jobs-count">0</h3>
-        <p>Total Jobs</p>
-      </div>
-      <div class="card">
-        <h3 id="total-amount">R0</h3>
-        <p id="amount-label">Total Earnings / Spent</p>
-      </div>
+    <div class="dashboard-cards" id="dashboard-cards">
+      <!-- Earnings / Total spent card -->
     </div>
 
-    <section>
-      <h3>Your Jobs</h3>
-      <div id="user-jobs"></div>
-    </section>
+    <h3>Your Jobs</h3>
+    <div id="applied-jobs">
+      <!-- Applied or posted jobs list -->
+    </div>
   </section>
 
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
+    const username = localStorage.getItem("userName") || "Hustler";
+    const userType = localStorage.getItem("userType") || "hustler";
+
+    document.getElementById("username").textContent = username;
+
     const logoutBtn = document.getElementById("logout-btn");
-    const usernameEl = document.getElementById("username");
-    const jobsCountEl = document.getElementById("jobs-count");
-    const totalAmountEl = document.getElementById("total-amount");
-    const amountLabelEl = document.getElementById("amount-label");
-    const userJobsEl = document.getElementById("user-jobs");
-
-    const userName = localStorage.getItem("userName");
-    const userEmail = localStorage.getItem("userEmail");
-    const userType = localStorage.getItem("userType"); // 'hustler' or 'client'
-
-    usernameEl.textContent = userName || "Hustler";
-
     logoutBtn.addEventListener("click", () => {
       localStorage.clear();
       window.location.href = "login.html";
     });
 
-    async function fetchUserJobs() {
+    const dashboardCards = document.getElementById("dashboard-cards");
+    const appliedJobsDiv = document.getElementById("applied-jobs");
+
+    async function loadDashboard() {
       try {
+        // Fetch all jobs
         const res = await fetch("http://localhost:5000/api/jobs");
         const jobs = await res.json();
 
-        // Filter jobs based on user type
-        let userJobs = [];
+        // Calculate totals
         let total = 0;
+        let userJobs = [];
 
-        if (userType === "client") {
-          userJobs = jobs.filter(job => job.postedBy === userName);
+        if(userType === "hustler") {
+          // Jobs applied by this hustler
+          userJobs = jobs.filter(job => job.appliedBy?.includes(username));
           total = userJobs.reduce((sum, job) => sum + Number(job.payment), 0);
-          amountLabelEl.textContent = "Total Spent";
+          dashboardCards.innerHTML = `<div class="card earnings">💰 Total Earnings: R${total}</div>`;
         } else {
-          // hustler
-          userJobs = jobs.filter(job => job.assignedTo === userName); // assuming you store assigned jobs
+          // Client: jobs posted by this user
+          userJobs = jobs.filter(job => job.postedBy === username);
           total = userJobs.reduce((sum, job) => sum + Number(job.payment), 0);
-          amountLabelEl.textContent = "Total Earnings";
+          dashboardCards.innerHTML = `<div class="card earnings">💸 Total Spent: R${total}</div>`;
         }
 
-        jobsCountEl.textContent = userJobs.length;
-        totalAmountEl.textContent = `R${total}`;
-
         // Display jobs
-        userJobsEl.innerHTML = userJobs.length
-          ? userJobs.map(job => `
-              <div class="card">
-                <h4>${job.title}</h4>
-                <p><strong>Location:</strong> ${job.location}</p>
-                <p><strong>Payment:</strong> R${job.payment}</p>
-                <p><strong>Availability:</strong> ${job.availability}</p>
-                <p>${job.description}</p>
-              </div>
-            `).join("")
-          : "<p>No jobs yet.</p>";
+        if(userJobs.length === 0) {
+          appliedJobsDiv.innerHTML = "<p>No jobs found.</p>";
+        } else {
+          appliedJobsDiv.innerHTML = userJobs.map(job => `
+            <div class="applied-job card">
+              <h4>${job.title}</h4>
+              <p><strong>Location:</strong> ${job.location}</p>
+              <p><strong>Payment:</strong> R${job.payment}</p>
+              <p><strong>Availability:</strong> ${job.availability}</p>
+              <button class="btn-chat" onclick="window.location.href='jobs.html#chat-${job._id}'">Chat</button>
+            </div>
+          `).join("");
+        }
 
-      } catch (err) {
+      } catch(err) {
         console.error(err);
-        userJobsEl.innerHTML = "<p>Unable to fetch jobs.</p>";
+        dashboardCards.innerHTML = "<p>Error loading dashboard.</p>";
+        appliedJobsDiv.innerHTML = "<p>Error loading jobs.</p>";
       }
     }
 
-    fetchUserJobs();
+    loadDashboard();
   </script>
 </body>
 </html>
