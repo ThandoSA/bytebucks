@@ -438,6 +438,7 @@ form input:focus, form textarea:focus {
   justify-content: space-between;
 }
 
+
 .dashboard-header h1 {
   display: flex;
   align-items: center;
@@ -521,7 +522,7 @@ header h1 {
 /* Dashboard Cards */
 .dashboard-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
   max-width: 900px;
   margin: 0 auto;
@@ -929,4 +930,50 @@ canvas {
   }
 }
 
+/* ===== AUTH BUTTONS ===== */
+.auth-buttons {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  z-index: 110;
+}
+
+/* Dashboard button */
+.auth-buttons .btn.dashboard-btn {
+  background-color: #ff9800;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: 0.3s;
+  text-decoration: none;
+}
+
+.auth-buttons .btn.dashboard-btn:hover {
+  background-color: #e68900;
+  transform: translateY(-2px);
+}
+
+/* Logout button */
+.auth-buttons .btn.logout-btn {
+  background-color: #ff4d4d;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.auth-buttons .btn.logout-btn:hover {
+  background-color: #e63939;
+  transform: translateY(-2px);
+}
+
+/* Optional: make them same size and aligned nicely */
+.auth-buttons .btn {
+  display: inline-block;
+  text-align: center;
+}
 

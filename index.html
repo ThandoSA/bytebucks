@@ -119,14 +119,19 @@
     const userName = localStorage.getItem("userName");
     const authButtons = document.getElementById("auth-buttons");
     if (userName && authButtons) {
-      authButtons.innerHTML = `<a href="dashboard.html" class="btn">Dashboard</a>
-                               <button class="btn logout-btn" onclick="logout()">Logout</button>`;
-    }
+     authButtons.innerHTML = `
+    <a href="dashboard.html" class="btn dashboard-btn">Dashboard</a>
+    <button class="btn logout-btn" onclick="logout()">Logout</button>
+    `;
+}
 
-    function logout() {
-      localStorage.clear();
-      window.location.href = "index.html";
-    }
+// Logout function
+function logout() {
+  localStorage.clear();
+  window.location.href = "index.html";
+}
+
+
   </script>
 </body>
 </html>
