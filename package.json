@@ -4,8 +4,8 @@
   "description": "A web platform that connects local job seekers and small task providers, promoting income opportunities and economic resilience through verified profiles, instant payments, and skill-based matching.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "start": "node server.js"
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ThandoSA/bytebucks.git"
