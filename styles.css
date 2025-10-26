@@ -1009,3 +1009,21 @@ canvas {
 .mobile-menu.active {
   display: block;
 }
+
+/* ===== HERO SECTION RESPONSIVE BUTTONS ===== */
+@media (max-width: 768px) {
+  .hero-buttons {
+    display: flex;
+    flex-direction: column; /* stack buttons vertically */
+    gap: 1rem; /* spacing between buttons */
+    align-items: center;
+  }
+
+  .hero-buttons .btn,
+  .hero-buttons .btn.btn-outline {
+    width: 90%; /* make buttons fit nicely */
+    max-width: 300px; /* optional max width */
+    text-align: center;
+    padding: 1rem; /* adjust padding */
+  }
+}
