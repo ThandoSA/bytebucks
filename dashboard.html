@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- ===== HEADER ===== -->
+  <!-- HEADER -->
   <header>
     <div class="container header-container">
       <div class="logo">
@@ -20,58 +20,93 @@
         <a href="findwork.html">Find Work</a>
         <a href="postajob.html">Post Job</a>
       </nav>
-      <button onclick="logout()" class="btn logout-btn"><i class="ri-logout-box-r-line"></i> Logout</button>
+      <button id="logout-btn" class="btn logout-btn"><i class="ri-logout-box-r-line"></i> Logout</button>
     </div>
   </header>
 
-  <!-- ===== DASHBOARD SECTION ===== -->
-  <section class="dashboard">
+  <!-- DASHBOARD -->
+  <section class="dashboard section">
     <h2>Welcome back, <span id="username"></span> 👋</h2>
+
     <div class="dashboard-cards">
-      <!-- Cards will be dynamically inserted here -->
+      <div class="card">
+        <h3 id="jobs-count">0</h3>
+        <p>Total Jobs</p>
+      </div>
+      <div class="card">
+        <h3 id="total-amount">R0</h3>
+        <p id="amount-label">Total Earnings / Spent</p>
+      </div>
     </div>
+
+    <section>
+      <h3>Your Jobs</h3>
+      <div id="user-jobs"></div>
+    </section>
   </section>
 
   <script>
-     // Get user info from localStorage (email or ID could also be stored)
-  const userName = localStorage.getItem("userName");
+    const logoutBtn = document.getElementById("logout-btn");
+    const usernameEl = document.getElementById("username");
+    const jobsCountEl = document.getElementById("jobs-count");
+    const totalAmountEl = document.getElementById("total-amount");
+    const amountLabelEl = document.getElementById("amount-label");
+    const userJobsEl = document.getElementById("user-jobs");
 
-  // Display a welcome message
-  const welcomeElement = document.getElementById("welcome-msg");
-  if (welcomeElement) {
-    welcomeElement.textContent = `Welcome, ${userName || "Hustler"}!`;
-  }
+    const userName = localStorage.getItem("userName");
+    const userEmail = localStorage.getItem("userEmail");
+    const userType = localStorage.getItem("userType"); // 'hustler' or 'client'
 
-  // Optionally fetch full user info from backend using email
-  async function fetchUserData() {
-    try {
-      // Assume email is stored in localStorage during login/signup
-      const email = localStorage.getItem("userEmail");
-      if (!email) return;
+    usernameEl.textContent = userName || "Hustler";
 
-      const res = await fetch(`http://localhost:5000/api/users?email=${email}`);
-      const data = await res.json();
-
-      if (res.ok && data.user) {
-        // Update UI with actual data from MongoDB
-        welcomeElement.textContent = `Welcome, ${data.user.name}!`;
-      }
-
-    } catch (err) {
-      console.error("Error fetching user data:", err);
-    }
-  }
-
-  fetchUserData();
-
-  // Logout button
-  const logoutBtn = document.getElementById("logout-btn");
-  if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       localStorage.clear();
       window.location.href = "login.html";
     });
-  }
+
+    async function fetchUserJobs() {
+      try {
+        const res = await fetch("http://localhost:5000/api/jobs");
+        const jobs = await res.json();
+
+        // Filter jobs based on user type
+        let userJobs = [];
+        let total = 0;
+
+        if (userType === "client") {
+          userJobs = jobs.filter(job => job.postedBy === userName);
+          total = userJobs.reduce((sum, job) => sum + Number(job.payment), 0);
+          amountLabelEl.textContent = "Total Spent";
+        } else {
+          // hustler
+          userJobs = jobs.filter(job => job.assignedTo === userName); // assuming you store assigned jobs
+          total = userJobs.reduce((sum, job) => sum + Number(job.payment), 0);
+          amountLabelEl.textContent = "Total Earnings";
+        }
+
+        jobsCountEl.textContent = userJobs.length;
+        totalAmountEl.textContent = `R${total}`;
+
+        // Display jobs
+        userJobsEl.innerHTML = userJobs.length
+          ? userJobs.map(job => `
+              <div class="card">
+                <h4>${job.title}</h4>
+                <p><strong>Location:</strong> ${job.location}</p>
+                <p><strong>Payment:</strong> R${job.payment}</p>
+                <p><strong>Availability:</strong> ${job.availability}</p>
+                <p>${job.description}</p>
+              </div>
+            `).join("")
+          : "<p>No jobs yet.</p>";
+
+      } catch (err) {
+        console.error(err);
+        userJobsEl.innerHTML = "<p>Unable to fetch jobs.</p>";
+      }
+    }
+
+    fetchUserJobs();
   </script>
 </body>
 </html>

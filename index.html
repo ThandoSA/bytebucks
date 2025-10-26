@@ -24,9 +24,9 @@
         <a href="postajob.html">Post a Job</a>
         <a href="#about">About</a>
       </nav>
-      <div class="auth-buttons">
-        <a href="signup.html" class="btn-signup"><i class="ri-user-add-line"></i> Sign Up</a>
-        <a href="login.html" class="btn-signin"><i class="ri-login-box-line"></i> Login</a>
+      <div class="auth-buttons" id="auth-buttons">
+        <a href="signup.html" class="btn btn-signup"><i class="ri-user-add-line"></i> Sign Up</a>
+        <a href="login.html" class="btn btn-signin"><i class="ri-login-box-line"></i> Login</a>
       </div>
       <div class="hamburger"><i class="ri-menu-line"></i></div>
     </div>
@@ -39,22 +39,26 @@
         <a href="#about">About</a>
       </nav>
       <div class="auth-buttons">
-        <a href="signup.html" class="btn-signup"><i class="ri-user-add-line"></i> Sign Up</a>
-        <a href="login.html" class="btn-signin"><i class="ri-login-box-line"></i> Login</a>
+        <a href="signup.html" class="btn btn-signup"><i class="ri-user-add-line"></i> Sign Up</a>
+        <a href="login.html" class="btn btn-signin"><i class="ri-login-box-line"></i> Login</a>
       </div>
     </div>
   </header>
 
   <!-- HERO SECTION -->
   <section class="hero" id="home">
-    <h2>Turn Your Hustle into Income – Anytime, Anywhere</h2>
-    <p>Find work. Post jobs. Get paid instantly with FNB.</p>
-    <a href="findwork.html" class="btn">Find Work</a>
-    <a href="postajob.html" class="btn">Post a Job</a>
+    <div class="hero-content">
+      <h2>Turn Your Hustle into Income – Anytime, Anywhere</h2>
+      <p>Find work. Post jobs. Get paid instantly with FNB.</p>
+      <div class="hero-buttons">
+        <a href="findwork.html" class="btn">Find Work</a>
+        <a href="postajob.html" class="btn btn-outline">Post a Job</a>
+      </div>
+    </div>
   </section>
 
   <!-- HOW IT WORKS -->
-  <section class="section">
+  <section class="section how-it-works">
     <h2>How It Works</h2>
     <div class="steps">
       <div class="card">1️⃣ Post a Job<br>Need help? Post in seconds.</div>
@@ -64,7 +68,7 @@
   </section>
 
   <!-- FEATURES -->
-  <section class="section">
+  <section class="section features-section">
     <h2>Features</h2>
     <div class="features">
       <div class="card"><i class="ri-user-3-line"></i> Verified Hustler Profiles</div>
@@ -81,7 +85,7 @@
   </div>
 
   <!-- ABOUT -->
-  <section class="section" id="about">
+  <section class="section about-section" id="about">
     <h2>About Side Hustle Hub</h2>
     <div class="about-container">
       <div class="about-text">
@@ -110,6 +114,19 @@
     hamburger.addEventListener('click', () => {
       mobileMenu.classList.toggle('active');
     });
+
+    // Dynamically switch login/signup to logout/dashboard if user is logged in
+    const userName = localStorage.getItem("userName");
+    const authButtons = document.getElementById("auth-buttons");
+    if (userName && authButtons) {
+      authButtons.innerHTML = `<a href="dashboard.html" class="btn">Dashboard</a>
+                               <button class="btn logout-btn" onclick="logout()">Logout</button>`;
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "index.html";
+    }
   </script>
 </body>
 </html>

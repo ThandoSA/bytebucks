@@ -1,93 +1,159 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jobs Board | Side Hustle Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <!-- HEADER -->
   <header>
     <div class="container header-container">
-        <div class="logo">
-            <h1><i class="ri-dashboard-line"></i>Side Hustle Hub - Jobs Board</h1>
-        </div>
-    <nav class="nav-desktop">
-      <a href="index.html">Home</a>
-      <a href="findwork.html">Find Work</a>
-      <a href="postajob.html">Post Job</a>
-      <a href="jobs.html" class="active">Jobs Board</a>
-    </nav>
+      <div class="logo">
+        <h1><i class="ri-dashboard-line"></i> Side Hustle Hub - Jobs Board</h1>
+      </div>
+      <nav class="nav-desktop">
+        <a href="index.html">Home</a>
+        <a href="findwork.html">Find Work</a>
+        <a href="postajob.html">Post Job</a>
+        <a href="jobs.html" class="active">Jobs Board</a>
+      </nav>
+      <button id="logout-btn" class="btn logout-btn"><i class="ri-logout-box-r-line"></i> Logout</button>
     </div>
   </header>
 
- <section class="section">
-  <h2>Available Jobs</h2>
+  <!-- JOBS SECTION -->
+  <section class="section">
+    <h2>Available Jobs</h2>
 
-  <div class="filters">
-    <input type="text" id="search-title" placeholder="Search by job title..." />
-    <input type="text" id="search-location" placeholder="Search by location..." />
-    <select id="filter-payment">
-      <option value="">All Payments</option>
-      <option value="Hourly">Hourly</option>
-      <option value="Fixed">Fixed</option>
-    </select>
-    <select id="filter-availability">
-      <option value="">All Availability</option>
-      <option value="Full-time">Full-time</option>
-      <option value="Part-time">Part-time</option>
-    </select>
-    <button id="filter-btn">Filter</button>
-  </div>
+    <!-- Filters -->
+    <div class="filters">
+      <input type="text" id="search-title" placeholder="Search by job title..." />
+      <input type="text" id="search-location" placeholder="Search by location..." />
+      <select id="filter-payment">
+        <option value="">All Payments</option>
+        <option value="Hourly">Hourly</option>
+        <option value="Fixed">Fixed</option>
+      </select>
+      <select id="filter-availability">
+        <option value="">All Availability</option>
+        <option value="Full-time">Full-time</option>
+        <option value="Part-time">Part-time</option>
+      </select>
+      <button id="filter-btn" class="btn"><i class="ri-filter-line"></i> Filter</button>
+    </div>
 
-  <div id="jobs-list"></div>
-</section>
+    <div id="jobs-list" class="jobs-list"></div>
 
-<script>
-  const jobsList = document.getElementById("jobs-list");
-  const searchTitle = document.getElementById("search-title");
-  const searchLocation = document.getElementById("search-location");
-  const filterPayment = document.getElementById("filter-payment");
-  const filterAvailability = document.getElementById("filter-availability");
-  const filterBtn = document.getElementById("filter-btn");
+    <div id="total-display" class="total-display"></div>
+  </section>
 
-  let jobs = [];
+  <script>
+    const jobsList = document.getElementById("jobs-list");
+    const searchTitle = document.getElementById("search-title");
+    const searchLocation = document.getElementById("search-location");
+    const filterPayment = document.getElementById("filter-payment");
+    const filterAvailability = document.getElementById("filter-availability");
+    const filterBtn = document.getElementById("filter-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+    const totalDisplay = document.getElementById("total-display");
 
-  // Fetch jobs from backend
-  async function fetchJobs() {
-    const res = await fetch("http://localhost:5000/api/jobs");
-    jobs = await res.json();
-    displayJobs(jobs);
-  }
+    let jobs = [];
+    const userType = localStorage.getItem("userType");
+    const userName = localStorage.getItem("userName");
 
-  function displayJobs(list) {
-    jobsList.innerHTML = list
-      .map(job => `
+    // Logout
+    logoutBtn.addEventListener("click", () => {
+      localStorage.clear();
+      window.location.href = "login.html";
+    });
+
+    // Fetch jobs from backend
+    async function fetchJobs() {
+      try {
+        const res = await fetch("http://localhost:5000/api/jobs");
+        if (!res.ok) throw new Error("Failed to fetch jobs");
+
+        jobs = await res.json();
+        displayJobs(jobs);
+        displayTotal(jobs);
+      } catch (err) {
+        console.error(err);
+        jobsList.innerHTML = "<p>Unable to load jobs. Please try again later.</p>";
+      }
+    }
+
+    // Display jobs
+    function displayJobs(list) {
+      if (list.length === 0) {
+        jobsList.innerHTML = "<p>No jobs found matching your criteria.</p>";
+        return;
+      }
+
+      jobsList.innerHTML = list.map(job => `
         <div class="card">
           <h3>${job.title}</h3>
           <p><strong>Location:</strong> ${job.location}</p>
-          <p><strong>Payment:</strong> ${job.payment}</p>
+          <p><strong>Payment:</strong> R${job.payment}</p>
           <p><strong>Availability:</strong> ${job.availability}</p>
           <p>${job.description}</p>
+          <p><em>Posted by: ${job.postedBy || "Anonymous"}</em></p>
+          ${userType === "hustler" && !job.assignedTo ? `<button onclick="acceptJob('${job._id}')">Accept Job</button>` : ''}
+          ${job.assignedTo ? `<p><strong>Assigned To:</strong> ${job.assignedTo}</p>` : ''}
         </div>
       `).join("");
-  }
+    }
 
-  // Filter jobs
-  filterBtn.addEventListener("click", () => {
-    let filtered = jobs.filter(job => {
-      return (
-        (searchTitle.value === "" || job.title.toLowerCase().includes(searchTitle.value.toLowerCase())) &&
-        (searchLocation.value === "" || job.location.toLowerCase().includes(searchLocation.value.toLowerCase())) &&
-        (filterPayment.value === "" || job.payment === filterPayment.value) &&
-        (filterAvailability.value === "" || job.availability === filterAvailability.value)
-      );
+    // Accept job (for hustlers)
+    async function acceptJob(jobId) {
+      try {
+        await fetch(`http://localhost:5000/api/jobs/${jobId}/accept`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ assignedTo: userName })
+        });
+        alert("Job accepted!");
+        fetchJobs(); // refresh
+      } catch (err) {
+        console.error(err);
+        alert("Failed to accept job.");
+      }
+    }
+
+    // Display total earnings/spent
+    function displayTotal(allJobs) {
+      let total = 0;
+      if (userType === "hustler") {
+        const userJobs = allJobs.filter(job => job.assignedTo === userName);
+        total = userJobs.reduce((sum, job) => sum + Number(job.payment), 0);
+        totalDisplay.innerHTML = `<p>Total Earnings: R${total}</p>`;
+      } else if (userType === "client") {
+        const clientJobs = allJobs.filter(job => job.postedBy === userName);
+        total = clientJobs.reduce((sum, job) => sum + Number(job.payment), 0);
+        totalDisplay.innerHTML = `<p>Total Spent: R${total}</p>`;
+      }
+    }
+
+    // Filter jobs
+    filterBtn.addEventListener("click", () => {
+      const filtered = jobs.filter(job => {
+        return (
+          (searchTitle.value === "" || job.title.toLowerCase().includes(searchTitle.value.toLowerCase())) &&
+          (searchLocation.value === "" || job.location.toLowerCase().includes(searchLocation.value.toLowerCase())) &&
+          (filterPayment.value === "" || job.payment === filterPayment.value) &&
+          (filterAvailability.value === "" || job.availability === filterAvailability.value)
+        );
+      });
+
+      displayJobs(filtered);
+      displayTotal(filtered);
     });
-    displayJobs(filtered);
-  });
 
-  fetchJobs();
-</script>
- 
+    // Initial fetch
+    fetchJobs();
+  </script>
 </body>
 </html>
