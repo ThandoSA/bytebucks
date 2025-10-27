@@ -5,58 +5,67 @@ require("dotenv").config();
 
 const app = express();
 
-// Middleware
+// ====== MIDDLEWARE ======
 app.use(express.json());
-app.use(cors());
 
-// Import routes
+// ✅ Allow your GitHub Pages site to access the backend
+app.use(cors({
+  origin: ["https://thandosa.github.io", "http://localhost:5500"], // allow GitHub Pages + local testing
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
+// ====== ROUTES ======
 const userRoutes = require("./routes/userRoutes");
 const jobRoutes = require("./routes/jobRoutes");
 
 app.use("/api/users", userRoutes);
 app.use("/api/jobs", jobRoutes);
 
-// Default route
+// Default route (for testing)
 app.get("/", (req, res) => {
-  res.send("Welcome to the Side Hustle Hub backend!");
+  res.send("✅ Welcome to the Side Hustle Hub backend is live!");
 });
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
+// ====== DATABASE CONNECTION ======
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
+// ====== START SERVER ======
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 
-// ===== SOCKET.IO SETUP =====
+// ====== SOCKET.IO SETUP ======
 const { Server } = require("socket.io");
 const io = new Server(server, {
-  cors: { origin: "*" } // allow all origins for dev
+  cors: {
+    origin: ["https://thandosa.github.io", "https://bytebucks-api.onrender.com"],
+    methods: ["GET", "POST"]
+  }
 });
 
-const onlineUsers = {}; // track online users per job room
+const onlineUsers = {}; // track online users per room
 
 io.on("connection", (socket) => {
   console.log("⚡ New socket connected:", socket.id);
 
-  // Join a job chat room
   socket.on("joinRoom", ({ room, user }) => {
     socket.join(room);
     if (!onlineUsers[room]) onlineUsers[room] = [];
     if (!onlineUsers[room].includes(user)) onlineUsers[room].push(user);
 
-    // Broadcast updated online users
     io.to(room).emit("updateUsers", { room, users: onlineUsers[room] });
   });
 
-  // Handle chat messages
   socket.on("chatMessage", ({ room, sender, message }) => {
     const time = new Date();
     io.to(room).emit("chatMessage", { room, sender, message, time });
   });
 
-  // Handle disconnect
   socket.on("disconnecting", () => {
     const rooms = Object.keys(socket.rooms);
     rooms.forEach(room => {
