@@ -61,7 +61,7 @@
 
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
-    const socket = io("http://localhost:5000"); // Connect to Socket.IO server
+    const socket = io("https://bytebucks-api.onrender.com/"); // Connect to Socket.IO server
 
     const jobsList = document.getElementById("jobs-list");
     const searchTitle = document.getElementById("search-title");
@@ -93,7 +93,7 @@
     // Fetch jobs
     async function fetchJobs() {
       try {
-        const res = await fetch("http://localhost:5000/api/jobs");
+        const res = await fetch("https://bytebucks-api.onrender.com/");
         if (!res.ok) throw new Error("Failed to fetch jobs");
         jobs = await res.json();
         displayJobs(jobs);
@@ -145,7 +145,7 @@
         button.addEventListener("click", async (e) => {
           const jobId = e.target.dataset.id;
           try {
-            const res = await fetch(`http://localhost:5000/api/jobs/apply/${jobId}`, {
+            const res = await fetch(`https://bytebucks-api.onrender.com/${jobId}`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ username })

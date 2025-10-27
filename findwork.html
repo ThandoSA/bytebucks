@@ -68,7 +68,7 @@
 
     async function fetchJobs() {
       try {
-        const res = await fetch("http://localhost:5000/api/jobs");
+        const res = await fetch("https://bytebucks-api.onrender.com/");
         if (!res.ok) throw new Error("Failed to fetch jobs");
         jobs = await res.json();
         displayJobs(jobs);
@@ -104,7 +104,7 @@
     async function applyToJob(e) {
       const jobId = e.target.getAttribute("data-id");
       try {
-        const res = await fetch(`http://localhost:5000/api/jobs/apply/${jobId}`, {
+        const res = await fetch(`https://bytebucks-api.onrender.com/${jobId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ applicantEmail: userEmail })

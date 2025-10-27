@@ -65,7 +65,7 @@
     async function loadDashboard() {
       try {
         // Fetch all jobs
-        const res = await fetch("http://localhost:5000/api/jobs");
+        const res = await fetch("https://bytebucks-api.onrender.com/");
         const jobs = await res.json();
 
         // Calculate totals

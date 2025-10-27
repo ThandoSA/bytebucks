@@ -26,7 +26,7 @@ This project was built for the **FNB Hackathon 2025** to promote inclusive emplo
 **Frontend:** HTML, CSS, JavaScript  
 **Backend:** Node.js, Express.js  
 **Database:** MongoDB  
-**Hosting:** GitHub Pages (Frontend), Render / Localhost (Backend)  
+**Hosting:** GitHub Pages (Frontend), Render (Backend)  
 **Payments:** FNB Integration (Prototype Phase)
 
 ---
