@@ -8,9 +8,14 @@ const app = express();
 // ====== MIDDLEWARE ======
 app.use(express.json());
 
-// ✅ Allow your GitHub Pages site to access the backend
+// ✅ Allow local & hosted frontend to access the backend
 app.use(cors({
-  origin: ["https://thandosa.github.io", "http://localhost:5500"], // allow GitHub Pages + local testing
+  origin: [
+    "http://127.0.0.1:5500", // local testing
+    "http://localhost:5500", // alternative local URL
+    "https://thandosa.github.io", // your GitHub Pages frontend
+    "https://bytebucks-api.onrender.com" // your backend itself
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
@@ -28,10 +33,7 @@ app.get("/", (req, res) => {
 });
 
 // ====== DATABASE CONNECTION ======
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
@@ -43,7 +45,12 @@ const server = app.listen(PORT, () => console.log(`🚀 Server running on port $
 const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
-    origin: ["https://thandosa.github.io", "https://bytebucks-api.onrender.com"],
+    origin: [
+      "http://127.0.0.1:5500",
+      "http://localhost:5500",
+      "https://thandosa.github.io",
+      "https://bytebucks-api.onrender.com"
+    ],
     methods: ["GET", "POST"]
   }
 });
