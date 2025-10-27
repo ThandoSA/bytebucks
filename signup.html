@@ -48,7 +48,7 @@
 const form = document.getElementById("signup-form");
 
 form.addEventListener("submit", async function(e) {
-  e.preventDefault(); // prevent page reload
+  e.preventDefault();
 
   const name = form.name.value.trim();
   const email = form.email.value.trim();
@@ -61,22 +61,40 @@ form.addEventListener("submit", async function(e) {
   }
 
   try {
+    // Make sure the URL points to your deployed backend
     const res = await fetch("https://bytebucks-api.onrender.com/api/users/signup", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
       body: JSON.stringify({ name, email, password, userType })
     });
 
+    // Log raw response for debugging
+    console.log("Raw response status:", res.status);
+
     if (res.ok) {
       const data = await res.json();
+      console.log("Signup success:", data);
       alert(`Welcome ${data.user.name}!`);
+      // Store user info in localStorage for dashboard access
+      localStorage.setItem("userName", data.user.name);
+      localStorage.setItem("userEmail", data.user.email);
       window.location.href = "dashboard.html";
     } else {
-      const err = await res.json();
+      const text = await res.text();
+      console.error("Signup failed response:", text);
+      let err;
+      try {
+        err = JSON.parse(text);
+      } catch {
+        err = { message: text };
+      }
       alert(err.message || "Signup failed!");
     }
   } catch (error) {
-    console.error(error);
+    console.error("Fetch error:", error);
     alert("Server error. Try again later.");
   }
 });

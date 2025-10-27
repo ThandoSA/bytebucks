@@ -35,46 +35,64 @@
   </section>
 
   <!-- SCRIPT -->
-  <script>
-  const loginForm = document.getElementById("signin-form");
+   <script>
+const loginForm = document.getElementById("signin-form");
 
-  loginForm.addEventListener("submit", async function(e) {
-    e.preventDefault();
+loginForm.addEventListener("submit", async function(e) {
+  e.preventDefault();
 
-    const email = loginForm.email.value.trim();
-    const password = loginForm.password.value;
+  const email = loginForm.email.value.trim();
+  const password = loginForm.password.value;
 
-    if (!email || !password) {
-      alert("Please fill in all fields.");
+  if (!email || !password) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  try {
+    const res = await fetch("https://bytebucks-api.onrender.com/api/users/login", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Accept": "application/json" // important for Render
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    // Log response for debugging
+    console.log("Raw response status:", res.status);
+
+    // Parse JSON safely
+    let data;
+    try {
+      data = await res.json();
+    } catch (err) {
+      const text = await res.text();
+      console.error("Failed to parse JSON:", text);
+      alert("Server returned an unexpected response. Try again later.");
       return;
     }
 
-    try {
-      const res = await fetch("https://bytebucks-api.onrender.com/api/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.message || "Login failed.");
-        return;
-      }
-
-      // Save user info in localStorage
-      localStorage.setItem("userName", data.user.name);
-      localStorage.setItem("userType", data.user.userType);
-
-      alert(`Welcome back, ${data.user.name}! Redirecting to your dashboard...`);
-      window.location.href = "dashboard.html";
-
-    } catch (err) {
-      console.error(err);
-      alert("An error occurred. Please try again.");
+    if (!res.ok) {
+      console.error("Login error:", data);
+      alert(data.message || "Login failed.");
+      return;
     }
-  });
-  </script>
+
+    // Save user info in localStorage for dashboard access
+    localStorage.setItem("userName", data.user.name);
+    localStorage.setItem("userEmail", data.user.email);
+    localStorage.setItem("userType", data.user.userType);
+
+    alert(`Welcome back, ${data.user.name}! Redirecting to your dashboard...`);
+    window.location.href = "dashboard.html";
+
+  } catch (err) {
+    console.error("Fetch error:", err);
+    alert("An error occurred. Please try again.");
+  }
+});
+</script>
+
 </body>
 </html>
